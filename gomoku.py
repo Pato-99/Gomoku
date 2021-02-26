@@ -1,249 +1,191 @@
-def occupied(field, x, y):  # checks if place is occupied
-    if field[x][y] != 'X' and field[x][y] != 'O':
-        return False
-    else:
+#!/usr/bin/python3.8
+from enum import Enum
+
+
+class Direction(Enum):
+    LEFT = 1
+    RIGHT = 2
+    UP = 3
+    DOWN = 4
+    UP_LEFT = 5
+    UP_RIGHT = 6
+    DOWN_LEFT = 7
+    DOWN_RIGHT = 8
+
+
+class Symbol(Enum):
+    X = 1
+    O = 2
+
+
+class Player():
+
+    def __init__(self, name, symbol):
+        self.name = name
+        self.symbol = symbol
+        self.score = 0
+
+    def wins(self):
+        self.score += 1
+
+    def getScore(self):
+        return self.score
+
+    def getSymbol(self):
+        return self.symbol
+
+    def switchSymbol(self):
+        if self.symbol == 'O':
+            self.symbol = 'X'
+        else:
+            self.symbol = 'O'
+
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return f"<class=Player(), name={self.name}, score={self.score}>"
+
+
+class Cell():
+
+    def __init__(self):
+        self.value = '_'
+
+    def isOccupied(self):
+        if self.value == '_':
+            return False
         return True
 
+    def setValue(self, newValue):
+        if not self.isOccupied():
+            self.value = newValue
 
-def get_coords(field):  # gets coords from input
-    while True:
-        try:
-            f_row, f_column = input('Enter coordinates: ').split()
+    def resetValue(self):
+        self.value = '_'
 
-            if not f_row.isdigit() or not f_column.isdigit():
-                print('You should enter numbers!')
-                continue
-
-            elif (int(f_row) < 1) or (int(f_row) > 15) or (int(f_column) < 1) or (int(f_column) > 15):
-                print('Coordinates should be from 1 to 15!')
-                continue
-
-            elif occupied(field, int(f_row) - 1, int(f_column) - 1):
-                print('This cell is occupied! Choose another one!')
-                continue
-
-            else:
-                break
-        except ValueError:
-            print('Wrong input')
-        except IndexError:
-            print('Coords out of range')
-
-    return int(f_row) - 1, int(f_column) - 1
+    def getValue(self):
+        return self.value
 
 
-def draw_board(field):  # updates gaming board
-    print('-------------------------------------------------')
+class Board():
 
-    for n in range(15):
-        print('|  {}  {}  {}  {}  {}  {}  {}  {}  {}  {}  {}  {}  {}  {}  {}  |'.format(field[n][0], field[n][1],
-                                                                                        field[n][2], field[n][3],
-                                                                                        field[n][4], field[n][5],
-                                                                                        field[n][6], field[n][7],
-                                                                                        field[n][8], field[n][9],
-                                                                                        field[n][10], field[n][11],
-                                                                                        field[n][12], field[n][13],
-                                                                                        field[n][14]))
+    def __init__(self, size):
+        self.size = size
+        self.cells = [[ Cell() for i in range(size)] for j in range(size)]
 
-    print('-------------------------------------------------')
+    def cell(self, coord_x, coord_y):
+        return self.cells[coord_x][coord_y]
 
-
-'''def spaces_check(field):
-    for f_row in field:
-        if '_' in f_row:
-            return True
-    return False'''
+    def draw(self):  # updates gaming board
+        print('    ', end='')
+        for i in range(self.size):
+            print(str(i + 1).rjust(3), end='')
+        print()
 
 
-'''def one_symbol_count(field, one_symbol):
-    count = 0
-    for f_row in field:
-        for symbol in f_row:
-            if symbol == one_symbol:
-                count += 1
-    return count'''
+        print("   +", end='')
+        for i in range(self.size * 3 + 2):
+            print('-', end='')
+        print('+')
 
-# -------------- functions that are checking win conditions --------------
+        for m in range(self.size):
+            print(str(m).rjust(2) + " | ", end='')
+            for n in range(self.size):
+                print(' {} '.format(self.cells[m][n].getValue()), end='')
+            print(" |")
 
+        print("   +", end='')
+        for i in range(self.size * 3 + 2):
+            print('-', end='')
+        print('+')
 
-def check_row(symbol, pos_row, pos_column, board):
-    right_count = 0
-    left_count = 0
+    def outOfBounds(self, x, y):
+        return x < 0 or x > self.size or y < 0 or y > self.size
 
-    temp_row = pos_row
-    temp_column = pos_column
+    def check(self, x, y, dir, player):
+        if self.outOfBounds(x, y) or board.cell(x, y).getValue() != player.getSymbol():
+            return 0
+        return self.check(x + dir[0], y + dir[1], dir, player) + 1
 
-    while board[temp_row][temp_column] == symbol:
-        right_count += 1
-        if temp_column == 14:
-            break
-        else:
-            temp_column += 1
-
-    temp_row = pos_row
-    temp_column = pos_column
-
-    while board[temp_row][temp_column] == symbol:
-        left_count += 1
-        if temp_column == 0:
-            break
-        else:
-            temp_column -= 1
-
-    if right_count + left_count - 1 >= 5:
-        return True
-    else:
-        return False
-
-
-'''def check_column(symbol, pos_row, pos_column, board):
-    up_count = 0
-    down_count = 0
-
-    temp_row = pos_row
-    temp_column = pos_column
-
-    while board[temp_row][temp_column] == symbol:
-        down_count += 1
-        if temp_row == 14:
-            break
-        else:
-            temp_row += 1
-
-    temp_row = pos_row
-    temp_column = pos_column
-
-    while board[temp_row][temp_column] == symbol:
-        up_count += 1
-        if temp_row == 0:
-            break
-        else:
-            temp_row -= 1
-
-    if up_count + down_count - 1 >= 5:
-        return True
-    else:
-        return False'''
-
-
-def check_diagonal_1(symbol, pos_row, pos_column, board):
-    right_count = 0
-    left_count = 0
-
-    temp_row = pos_row
-    temp_column = pos_column
-
-    while board[temp_row][temp_column] == symbol:
-        right_count += 1
-        if temp_column == 14 or temp_row == 14:
-            break
-        else:
-            temp_column += 1
-            temp_row += 1
-
-    temp_row = pos_row
-    temp_column = pos_column
-
-    while board[temp_row][temp_column] == symbol:
-        left_count += 1
-        if temp_column == 0 or temp_row == 0:
-            break
-        else:
-            temp_column -= 1
-            temp_row -= 1
-
-    if right_count + left_count - 1 >= 5:
-        return True
-    else:
+    def checkWin(self, x, y, player):
+        dir = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [-1, 1], [1, -1]]
+        for i in range(0, 8, 2):
+            if self.check(x, y, dir[i], player) + self.check(x, y, dir[i + 1], player) >= 5 + 1:
+                return True
         return False
 
+    def get_coords(self):  # gets coords from input
+        while True:
+            try:
+                f_row, f_column = input('Enter coordinates: ').split()
 
-def check_diagonal_2(symbol, pos_row, pos_column, board):
-    right_count = 0
-    left_count = 0
+                if not f_row.isdigit() or not f_column.isdigit():
+                    print('You should enter numbers!')
+                    continue
 
-    temp_row = pos_row
-    temp_column = pos_column
+                elif (int(f_row) < 1) or (int(f_row) > self.size) or (int(f_column) < 1) or (int(f_column) > self.size):
+                    print('Coordinates should be from 1 to 15!')
+                    continue
 
-    while board[temp_row][temp_column] == symbol:
-        right_count += 1
-        if temp_column == 14 or temp_row == 0:
-            break
-        else:
-            temp_column += 1
-            temp_row -= 1
+                elif self.cell(int(f_row) - 1, int(f_column) - 1).isOccupied():
+                    print('This cell is occupied! Choose another one!')
+                    continue
 
-    temp_row = pos_row
-    temp_column = pos_column
+                else:
+                    break
+            except ValueError:
+                print('Wrong input')
+            except IndexError:
+                print('Coords out of range')
 
-    while board[temp_row][temp_column] == symbol:
-        left_count += 1
-        if temp_column == 0 or temp_row == 14:
-            break
-        else:
-            temp_column -= 1
-            temp_row += 1
-
-    if right_count + left_count - 1 >= 5:
-        return True
-    else:
-        return False
-
-
-def win(symbol, pos_row, pos_column, board):
-    if (
-        check_row(symbol, pos_column, pos_row, board)
-        or check_row(symbol, pos_row, pos_column, board)
-        or check_diagonal_1(symbol, pos_row, pos_column, board)
-        or check_diagonal_2(symbol, pos_row, pos_column, board)
-    ):
-
-        return True
+        return int(f_row) - 1, int(f_column) - 1
 
 
 # ------------- main program ---------------------
 
-x_wins = 0
-o_wins = 0
-
+p1 = Player("Pat", "X")
+p2 = Player("Nik", "O")
 while True:
-    cells = ['_' for i in range(15 ** 2)]  # setting up plain board
-    nested_cells = []
-    for i in range(0, len(cells), 15):
-        nested_cells.append([cells[i], cells[i + 1], cells[i + 2], cells[i + 3], cells[i + 4],
-                             cells[i + 5], cells[i + 6], cells[i + 7], cells[i + 8], cells[i + 9],
-                             cells[i + 10], cells[i + 11], cells[i + 12], cells[i + 13], cells[i + 14]])
-
-    draw_board(nested_cells)
+    board = Board(15)
+    board.draw()
     move = 1
+
+    if p1.getSymbol() == 'X':
+        print(f'player: {p1} begins!')
+    else:
+        print(f'player: {p2} begins!')
+
 
 # ------------ this is where game starts --------------
 
     while True:
-        row, column = get_coords(nested_cells)
+        row, column = board.get_coords()
 
         if move % 2 != 0:
-            nested_cells[row][column] = 'X'
+            board.cell(row, column).setValue('X')
         else:
-            nested_cells[row][column] = 'O'
+            board.cell(row, column).setValue('O')
 
         move += 1
-        draw_board(nested_cells)
+        board.draw()
 
         # ------------------ checking if win -----------------------
-        if win('X', row, column, nested_cells):
-            print('X wins')
-            x_wins += 1
+        if board.checkWin(row, column, p1):
+            p1.wins()
             break
-        elif win('O', row, column, nested_cells):
-            print('O wins')
-            o_wins += 1
+        elif board.checkWin(row, column, p2):
+            p2.wins()
             break
 
-    print('\nScore: \nX vs Y\n{} vs {}\n'.format(x_wins, o_wins))
+
+    print('\nScore: \n{} vs {}\n{} vs {}\n'.format(p1, p2, p1.getScore(), p2.getScore()))
     selection = input('Do you wish to play again?(y/n)\n')
 
     if selection.lower() == 'y':
+        p1.switchSymbol()
+        p2.switchSymbol()
         continue
     elif selection.lower() == 'n':
         print('Bye bye!')

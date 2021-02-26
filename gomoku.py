@@ -1,4 +1,9 @@
-#!/usr/bin/python3.8
+#!/usr/bin/python3
+
+import os
+from time import sleep
+
+
 from enum import Enum
 
 
@@ -143,19 +148,30 @@ class Board():
         return int(f_row) - 1, int(f_column) - 1
 
 
+
+def clearScreen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
 # ------------- main program ---------------------
 
-p1 = Player("Pat", "X")
-p2 = Player("Nik", "O")
+clearScreen()
+p1 = Player(input("Enter name of player 1: "), 'X')
+p2 = Player(input("Enter name of player 2: "), 'O')
+
+board = Board(15)
+
+if p1.getSymbol() == 'X':
+    print(f'player: {p1} begins!')
+else:
+    print(f'player: {p2} begins!')
+sleep(2)
+
 while True:
-    board = Board(15)
+    clearScreen()
     board.draw()
     move = 1
 
-    if p1.getSymbol() == 'X':
-        print(f'player: {p1} begins!')
-    else:
-        print(f'player: {p2} begins!')
+
 
 
 # ------------ this is where game starts --------------
@@ -169,6 +185,7 @@ while True:
             board.cell(row, column).setValue('O')
 
         move += 1
+        clearScreen()
         board.draw()
 
         # ------------------ checking if win -----------------------

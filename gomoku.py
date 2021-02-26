@@ -26,7 +26,14 @@ class Symbol(Enum):
 class Player():
 
     def __init__(self, name, symbol):
-        self.name = name
+        if name == '':
+            if symbol == 'X':
+                self.name = 'Player 1'
+            else:
+                self.name = 'Player 2'
+        else:
+            self.name = name
+
         self.symbol = symbol
         self.score = 0
 
@@ -160,13 +167,15 @@ p2 = Player(input("Enter name of player 2: "), 'O')
 
 board = Board(15)
 
-if p1.getSymbol() == 'X':
-    print(f'player: {p1} begins!')
-else:
-    print(f'player: {p2} begins!')
-sleep(2)
 
 while True:
+    clearScreen()
+    if p1.getSymbol() == 'X':
+        print(f'{p1} begins!')
+    else:
+        print(f'{p2} begins!')
+    sleep(1.5)
+
     clearScreen()
     board.draw()
     move = 1
@@ -174,7 +183,7 @@ while True:
 
 
 
-# ------------ this is where game starts --------------
+    # ------------ this is where game starts --------------
 
     while True:
         row, column = board.get_coords()

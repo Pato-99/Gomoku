@@ -102,7 +102,7 @@ class Board():
         print('+')
 
         for m in range(self.size):
-            print(str(m).rjust(2) + " | ", end='')
+            print(str(m + 1).rjust(2) + " | ", end='')
             for n in range(self.size):
                 print(' {} '.format(self.cells[m][n].getValue()), end='')
             print(" |")

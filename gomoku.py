@@ -71,8 +71,7 @@ class Cell():
         return True
 
     def setValue(self, newValue):
-        if not self.isOccupied():
-            self.value = newValue
+        self.value = newValue
 
     def resetValue(self):
         self.value = '_'
@@ -154,6 +153,11 @@ class Board():
 
         return int(f_row) - 1, int(f_column) - 1
 
+    def reset(self):
+        for row in self.cells:
+            for cell in row:
+                cell.setValue('_')
+
 
 
 def clearScreen():
@@ -162,14 +166,16 @@ def clearScreen():
 # ------------- main program ---------------------
 
 clearScreen()
+board = Board(15)
 p1 = Player(input("Enter name of player 1: "), 'X')
 p2 = Player(input("Enter name of player 2: "), 'O')
 
-board = Board(15)
+
 
 
 while True:
     clearScreen()
+
     if p1.getSymbol() == 'X':
         print(f'{p1} begins!')
     else:
@@ -177,6 +183,7 @@ while True:
     sleep(1.5)
 
     clearScreen()
+    board.reset()
     board.draw()
     move = 1
 

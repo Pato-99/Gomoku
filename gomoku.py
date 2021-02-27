@@ -113,7 +113,7 @@ class Board():
         print('+')
 
     def outOfBounds(self, x, y):
-        return x < 0 or x > self.size or y < 0 or y > self.size
+        return x < 0 or x >= self.size or y < 0 or y >= self.size
 
     def check(self, x, y, dir, player):
         if self.outOfBounds(x, y) or board.cell(x, y).getValue() != player.getSymbol():
@@ -169,9 +169,6 @@ clearScreen()
 board = Board(15)
 p1 = Player(input("Enter name of player 1: "), 'X')
 p2 = Player(input("Enter name of player 2: "), 'O')
-
-
-
 
 while True:
     clearScreen()

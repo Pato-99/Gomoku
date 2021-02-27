@@ -156,7 +156,7 @@ class Board():
     def reset(self):
         for row in self.cells:
             for cell in row:
-                cell.setValue('_')
+                cell.resetValue()
 
 
 

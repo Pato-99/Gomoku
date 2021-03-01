@@ -190,6 +190,8 @@ while True:
     # ------------ this is where game starts --------------
 
     while True:
+        print(f'Last move {row} {column}')
+        print(f'{} on move!')
         row, column = board.get_coords()
 
         if move % 2 != 0:

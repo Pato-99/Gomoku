@@ -190,8 +190,20 @@ while True:
     # ------------ this is where game starts --------------
 
     while True:
-        print(f'Last move {row} {column}')
-        print(f'{} on move!')
+        if move > 1:
+            print(f'Last move {row} {column}')
+
+        if move % 2 != 0:
+            if p1.getSymbol() == 'X':
+                print(f'{p1} on move!')
+            else:
+                print(f'{p2} on move!')
+        else:
+            if p1.getSymbol() == 'X':
+                print(f'{p2} on move!')
+            else:
+                print(f'{p1} on move!')
+
         row, column = board.get_coords()
 
         if move % 2 != 0:
